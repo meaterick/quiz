@@ -1,0 +1,113 @@
+import tkinter as tk
+from tkinter import messagebox
+from tkinter import ttk
+import random
+
+# 퀴즈 데이터 (문제와 정답)
+quiz_data = [
+    {"question": "세계에서 가장 큰 바다는?", "answer": "태평양"},
+    {"question": "우리나라의 수도는?", "answer": "서울"},
+    {"question": "피라미드는 어느 나라에 있나요?", "answer": "이집트"},
+    {"question": "지구에서 가장 높은 산은?", "answer": "에베레스트"},
+    {"question": "인류가 달에 처음 착륙한 해는?", "answer": "1969년"},
+    {"question": "일주일은 몇 일인가요?", "answer": "7일"},
+    {"question": "태양계에서 가장 큰 행성은?", "answer": "목성"},
+    {"question": "컴퓨터에서 사용되는 이진법의 기본 숫자는?", "answer": "0과 1"},
+    {"question": "빛의 속도는 약 몇 km/s인가요?", "answer": "300,000 km/s"},
+    {"question": "지구에서 가장 깊은 해구는?", "answer": "마리아나 해구"},
+    {"question": "한국의 전통음악은 무엇인가요?", "answer": "국악"},
+    {"question": "세계에서 가장 작은 나라는?", "answer": "바티칸"},
+    {"question": "모나리자는 누구의 작품인가요?", "answer": "레오나르도 다 빈치"},
+    {"question": "세계에서 가장 긴 강은?", "answer": "나일강"},
+    {"question": "영국의 수도는?", "answer": "런던"},
+    {"question": "눈은 어떤 상태의 물인가요?", "answer": "고체"},
+    {"question": "한글을 창제한 왕은?", "answer": "세종대왕"},
+    {"question": "하루는 몇 시간인가요?", "answer": "24시간"},
+    {"question": "지구의 위성은 무엇인가요?", "answer": "달"},
+    {"question": "최초로 만든 전구는 누구의 발명품인가요?", "answer": "에디슨"},
+]
+
+# 퀴즈 게임 클래스
+class QuizGame:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("퀴즈 게임")
+        self.root.geometry("600x400")  # 창 크기 설정
+        self.center_window()  # 창을 화면 가운데로 이동
+        
+        # 스타일 설정
+        self.style = ttk.Style()
+        self.style.configure("TButton", font=("Arial", 14), padding=10)
+        self.style.configure("TLabel", font=("Arial", 16))
+        self.style.configure("TEntry", font=("Arial", 14))
+        
+        # 퀴즈 데이터 섞기
+        self.questions = quiz_data.copy()
+        random.shuffle(self.questions)
+        self.current_question_index = 0
+        self.score = 0
+        
+        # UI 구성
+        self.label_question = ttk.Label(root, text="", wraplength=550, anchor="center", justify="center")
+        self.label_question.pack(pady=30)
+
+        self.entry_answer = ttk.Entry(root, width=40)
+        self.entry_answer.pack(pady=10)
+
+        self.button_submit = ttk.Button(root, text="제출", command=self.check_answer)
+        self.button_submit.pack(pady=20)
+
+        self.label_score = ttk.Label(root, text="점수: 0", anchor="center")
+        self.label_score.pack(pady=20)
+        
+        # 첫 번째 문제 표시
+        self.display_question()
+
+    def center_window(self):
+        """창을 화면 가운데로 배치"""
+        window_width = 600
+        window_height = 400
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        position_top = int(screen_height / 2 - window_height / 2)
+        position_right = int(screen_width / 2 - window_width / 2)
+        self.root.geometry(f"{window_width}x{window_height}+{position_right}+{position_top}")
+
+    def display_question(self):
+        """현재 질문 표시"""
+        question = self.questions[self.current_question_index]["question"]
+        self.label_question.config(text=f"문제 {self.current_question_index + 1}: {question}")
+
+    def check_answer(self):
+        """사용자의 답변 확인"""
+        user_answer = self.entry_answer.get().strip()
+        correct_answer = self.questions[self.current_question_index]["answer"]
+        
+        if user_answer == correct_answer:
+            self.score += 1
+            messagebox.showinfo("정답!", "정답입니다!")
+        else:
+            messagebox.showerror("오답", f"오답입니다. 정답은 '{correct_answer}'입니다.")
+        
+        # 다음 문제로 이동
+        self.current_question_index += 1
+        self.entry_answer.delete(0, tk.END)
+
+        if self.current_question_index < len(self.questions):
+            self.display_question()
+        else:
+            self.end_game()
+
+        # 점수 업데이트
+        self.label_score.config(text=f"점수: {self.score}")
+
+    def end_game(self):
+        """퀴즈 종료"""
+        messagebox.showinfo("퀴즈 끝", f"퀴즈가 끝났습니다!\n최종 점수: {self.score}점")
+        self.root.quit()
+
+# 메인 윈도우 실행
+if __name__ == "__main__":
+    root = tk.Tk()
+    game = QuizGame(root)
+    root.mainloop()
